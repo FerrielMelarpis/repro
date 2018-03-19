@@ -5,6 +5,7 @@ import ToastPlugin from './toast';
 import i18nPlugin from './i18n';
 import GoogleAPIPlugin from './google-api';
 import JWTPlugin from './jwt';
+import VueClipboards from 'vue-clipboards';
 
 export default [
     Quasar,
@@ -14,4 +15,5 @@ export default [
     i18nPlugin,
     GoogleAPIPlugin,
     JWTPlugin,
+    VueClipboards,
 ];
