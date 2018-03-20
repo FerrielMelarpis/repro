@@ -15,17 +15,65 @@
             <q-list no-border link inset-separator>
                 <q-list-header>Essential Links</q-list-header>
 
-                <div
-                    v-for="link in links"
-                    :data-v-step="link.label"
-                >
+                <div v-for="link in links" :id="`tour-step-${link.label}`">
                     <q-side-link item :to="link.to">
                         <q-item-side :icon="link.icon"/>
                         <q-item-main :label="link.label" :sublabel="link.sublabel"/>
+                        <v-tour name="sampleTour" :steps="steps">
+                            <template slot-scope="tour">
+                                <q-popover
+                                    v-for="(step, index) in tour.steps"
+                                    :value="tour.currentStep === index"
+                                    :key="index"
+                                >
+                                    <q-card flat>
+                                        <q-card-title>
+                                            {{ step.header.title }}
+                                        </q-card-title>
+                                        <q-card-main>
+                                            {{ step.content }}
+                                        </q-card-main>
+                                        <q-card-actions>
+                                            <q-btn
+                                                flat
+                                                color="primary"
+                                                @click="tour.stop"
+                                                v-if="!tour.isLast"
+                                            >
+                                                Skip tour
+                                            </q-btn>
+                                            <q-btn
+                                                flat
+                                                color="primary"
+                                                @click="tour.previousStep"
+                                                v-if="!tour.isFirst"
+                                            >
+                                                Previous
+                                            </q-btn>
+                                            <q-btn
+                                                flat
+                                                color="primary"
+                                                @click="tour.nextStep"
+                                                v-if="!tour.isLast"
+                                            >
+                                                Next
+                                            </q-btn>
+                                            <q-btn
+                                                flat
+                                                color="primary"
+                                                @click="tour.stop"
+                                                v-if="tour.isLast"
+                                            >
+                                                Finish
+                                            </q-btn>
+                                        </q-card-actions>
+                                    </q-card>
+                                </q-popover>
+                            </template>
+                        </v-tour>
                     </q-side-link>
                 </div>
             </q-list>
-            <v-tour name="sampleTour" :steps="steps"/>
         </div>
 
         <router-view/>
@@ -45,7 +93,13 @@
         QListHeader,
         QBtn,
         QIcon,
+        QCard,
+        QCardTitle,
+        QCardMain,
+        QCardActions,
+        QPopover,
     } from 'quasar';
+    import Shepherd from 'tether-shepherd';
 
     export default {
         name: 'Home',
@@ -62,6 +116,11 @@
             QListHeader,
             QBtn,
             QIcon,
+            QCard,
+            QCardTitle,
+            QCardMain,
+            QCardActions,
+            QPopover,
         },
 
         data() {
@@ -79,9 +138,6 @@
                             title: 'Docs'
                         },
                         content: 'This is the Docs page',
-                        params: {
-                            placement: 'left',
-                        }
                     },
                     {
                         target: '[data-v-step="Forums"]',
@@ -89,13 +145,6 @@
                             title: 'Forums',
                         },
                         content: 'This is the Forums page',
-                        params: {
-                            placement: 'left',
-                            preventOverflow: {
-                                enabled: true,
-                                boundariesElement: 'viewport',
-                            }
-                        }
                     },
                     {
                         target: '[data-v-step="Chat"]',
@@ -116,7 +165,18 @@
         },
 
         mounted() {
-            this.$tours.sampleTour.start();
+            const tour = new Shepherd.Tour();
+            tour.addStep('Docs', {
+                text: 'This is the Docs page',
+                attachTo: '#tour-step-Docs',
+                buttons: [
+                    {
+                        text: 'Next',
+                        action: tour.next
+                    }
+                ]
+            });
+            tour.start();
         }
     };
 </script>
